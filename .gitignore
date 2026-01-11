@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.env
+.topics.txt
+.hidden_topics/
