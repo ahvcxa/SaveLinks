@@ -1,0 +1,138 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\inanb\Desktop\SaveLinks
+plugins: anyio-4.12.1
+collected 9 items
+
+tests\test_security.py ....                                              [ 44%]
+tests\test_service.py FFFFF                                              [100%]
+
+================================== FAILURES ===================================
+_____________________________ test_register_login _____________________________
+src\database\repository.py:58: in add_user
+    cursor.execute(
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+src\service\link_service.py:22: in register_user
+    self.repository.add_user(username, salt, verifier)
+src\database\repository.py:68: in add_user
+    raise DatabaseError("Failed to add user.") from e
+E   src.core.exceptions.DatabaseError: Failed to add user.
+
+During handling of the above exception, another exception occurred:
+tests\test_service.py:18: in test_register_login
+    assert service.register_user(username, password) is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\service\link_service.py:27: in register_user
+    raise SaveLinksError("Registration failed. Username might be taken.")
+E   src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+---------------------------- Captured stderr call -----------------------------
+2026-02-11 20:03:27,712 - SaveLinks - ERROR - Failed to add user: no such table: users
+2026-02-11 20:03:27,712 - SaveLinks - ERROR - Registration failed for user 'testuser': Failed to add user.
+------------------------------ Captured log call ------------------------------
+ERROR    SaveLinks:repository.py:67 Failed to add user: no such table: users
+ERROR    SaveLinks:link_service.py:26 Registration failed for user 'testuser': Failed to add user.
+_________________________ test_login_invalid_password _________________________
+src\database\repository.py:58: in add_user
+    cursor.execute(
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+src\service\link_service.py:22: in register_user
+    self.repository.add_user(username, salt, verifier)
+src\database\repository.py:68: in add_user
+    raise DatabaseError("Failed to add user.") from e
+E   src.core.exceptions.DatabaseError: Failed to add user.
+
+During handling of the above exception, another exception occurred:
+tests\test_service.py:26: in test_login_invalid_password
+    service.register_user("user2", "pass")
+src\service\link_service.py:27: in register_user
+    raise SaveLinksError("Registration failed. Username might be taken.")
+E   src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+---------------------------- Captured stderr call -----------------------------
+2026-02-11 20:03:27,770 - SaveLinks - ERROR - Failed to add user: no such table: users
+2026-02-11 20:03:27,770 - SaveLinks - ERROR - Registration failed for user 'user2': Failed to add user.
+------------------------------ Captured log call ------------------------------
+ERROR    SaveLinks:repository.py:67 Failed to add user: no such table: users
+ERROR    SaveLinks:link_service.py:26 Registration failed for user 'user2': Failed to add user.
+____________________________ test_add_search_link _____________________________
+src\database\repository.py:58: in add_user
+    cursor.execute(
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+src\service\link_service.py:22: in register_user
+    self.repository.add_user(username, salt, verifier)
+src\database\repository.py:68: in add_user
+    raise DatabaseError("Failed to add user.") from e
+E   src.core.exceptions.DatabaseError: Failed to add user.
+
+During handling of the above exception, another exception occurred:
+tests\test_service.py:31: in test_add_search_link
+    service.register_user("user3", "pass")
+src\service\link_service.py:27: in register_user
+    raise SaveLinksError("Registration failed. Username might be taken.")
+E   src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+---------------------------- Captured stderr call -----------------------------
+2026-02-11 20:03:27,796 - SaveLinks - ERROR - Failed to add user: no such table: users
+2026-02-11 20:03:27,796 - SaveLinks - ERROR - Registration failed for user 'user3': Failed to add user.
+------------------------------ Captured log call ------------------------------
+ERROR    SaveLinks:repository.py:67 Failed to add user: no such table: users
+ERROR    SaveLinks:link_service.py:26 Registration failed for user 'user3': Failed to add user.
+___________________________ test_search_no_results ____________________________
+src\database\repository.py:58: in add_user
+    cursor.execute(
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+src\service\link_service.py:22: in register_user
+    self.repository.add_user(username, salt, verifier)
+src\database\repository.py:68: in add_user
+    raise DatabaseError("Failed to add user.") from e
+E   src.core.exceptions.DatabaseError: Failed to add user.
+
+During handling of the above exception, another exception occurred:
+tests\test_service.py:42: in test_search_no_results
+    service.register_user("user4", "pass")
+src\service\link_service.py:27: in register_user
+    raise SaveLinksError("Registration failed. Username might be taken.")
+E   src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+---------------------------- Captured stderr call -----------------------------
+2026-02-11 20:03:27,820 - SaveLinks - ERROR - Failed to add user: no such table: users
+2026-02-11 20:03:27,820 - SaveLinks - ERROR - Registration failed for user 'user4': Failed to add user.
+------------------------------ Captured log call ------------------------------
+ERROR    SaveLinks:repository.py:67 Failed to add user: no such table: users
+ERROR    SaveLinks:link_service.py:26 Registration failed for user 'user4': Failed to add user.
+______________________________ test_delete_link _______________________________
+src\database\repository.py:58: in add_user
+    cursor.execute(
+E   sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+src\service\link_service.py:22: in register_user
+    self.repository.add_user(username, salt, verifier)
+src\database\repository.py:68: in add_user
+    raise DatabaseError("Failed to add user.") from e
+E   src.core.exceptions.DatabaseError: Failed to add user.
+
+During handling of the above exception, another exception occurred:
+tests\test_service.py:49: in test_delete_link
+    service.register_user("user5", "pass")
+src\service\link_service.py:27: in register_user
+    raise SaveLinksError("Registration failed. Username might be taken.")
+E   src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+---------------------------- Captured stderr call -----------------------------
+2026-02-11 20:03:27,844 - SaveLinks - ERROR - Failed to add user: no such table: users
+2026-02-11 20:03:27,844 - SaveLinks - ERROR - Registration failed for user 'user5': Failed to add user.
+------------------------------ Captured log call ------------------------------
+ERROR    SaveLinks:repository.py:67 Failed to add user: no such table: users
+ERROR    SaveLinks:link_service.py:26 Registration failed for user 'user5': Failed to add user.
+=========================== short test summary info ===========================
+FAILED tests/test_service.py::test_register_login - src.core.exceptions.SaveL...
+FAILED tests/test_service.py::test_login_invalid_password - src.core.exceptio...
+FAILED tests/test_service.py::test_add_search_link - src.core.exceptions.Save...
+FAILED tests/test_service.py::test_search_no_results - src.core.exceptions.Sa...
+FAILED tests/test_service.py::test_delete_link - src.core.exceptions.SaveLink...
+========================= 5 failed, 4 passed in 0.31s =========================

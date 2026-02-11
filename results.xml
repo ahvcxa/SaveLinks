@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="9" time="0.323" timestamp="2026-02-11T20:04:04.640157+03:00" hostname="HP"><testcase classname="tests.test_security" name="test_generate_salt" time="0.001" /><testcase classname="tests.test_security" name="test_derive_key" time="0.042" /><testcase classname="tests.test_security" name="test_encrypt_decrypt" time="0.017" /><testcase classname="tests.test_security" name="test_decrypt_invalid_key" time="0.032" /><testcase classname="tests.test_service" name="test_register_login" time="0.017"><failure message="src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.">self = &lt;src.database.repository.LinkRepository object at 0x000001DD08FBA510&gt;
+username = 'testuser'
+salt = b'99\xb1\x9e!\x17\xde\x86\xfaG\xe9\x96\xaf\xdc\x97\x90'
+verifier = b':\xfa\x02|\xc9[\xec\x14\x99\x10(@\xe3\xa5P\xc6\x16\xfeA$\x8a\x94\xce.\xd4&lt;\x8e\xcdU\\\xa5\xf1'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+&gt;               cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+E               sqlite3.OperationalError: no such table: users
+
+src\database\repository.py:58: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08FBA3C0&gt;
+username = 'testuser', password = 'password123'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+&gt;           self.repository.add_user(username, salt, verifier)
+
+src\service\link_service.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.database.repository.LinkRepository object at 0x000001DD08FBA510&gt;
+username = 'testuser'
+salt = b'99\xb1\x9e!\x17\xde\x86\xfaG\xe9\x96\xaf\xdc\x97\x90'
+verifier = b':\xfa\x02|\xc9[\xec\x14\x99\x10(@\xe3\xa5P\xc6\x16\xfeA$\x8a\x94\xce.\xd4&lt;\x8e\xcdU\\\xa5\xf1'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+                conn.commit()
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            raise DatabaseError("User already exists.")
+        except sqlite3.Error as e:
+            logger.error(f"Failed to add user: {e}")
+&gt;           raise DatabaseError("Failed to add user.") from e
+E           src.core.exceptions.DatabaseError: Failed to add user.
+
+src\database\repository.py:68: DatabaseError
+
+During handling of the above exception, another exception occurred:
+
+service = &lt;src.service.link_service.LinkService object at 0x000001DD08FBA3C0&gt;
+
+    def test_register_login(service):
+        username = "testuser"
+        password = "password123"
+    
+        # Register
+&gt;       assert service.register_user(username, password) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_service.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08FBA3C0&gt;
+username = 'testuser', password = 'password123'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+            self.repository.add_user(username, salt, verifier)
+            logger.info(f"User '{username}' registered successfully.")
+            return True
+        except Exception as e:
+            logger.error(f"Registration failed for user '{username}': {e}")
+&gt;           raise SaveLinksError("Registration failed. Username might be taken.")
+E           src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+
+src\service\link_service.py:27: SaveLinksError</failure></testcase><testcase classname="tests.test_service" name="test_login_invalid_password" time="0.017"><failure message="src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.">self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F6A990&gt;
+username = 'user2', salt = b'G\x13\x12Et\x9c\x94&amp;^\xaao\xf0\xe6\xec\x94\xcf'
+verifier = b'|b\xb7\x13\xef\x04\xf7;\xa6\xc2V\xd3\x8f\x97\xc5\x14\xd95\x1d(\t\xac\xfc@\xb6\x01E\x82P]C\x8d'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+&gt;               cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+E               sqlite3.OperationalError: no such table: users
+
+src\database\repository.py:58: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08F6AAD0&gt;
+username = 'user2', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+&gt;           self.repository.add_user(username, salt, verifier)
+
+src\service\link_service.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F6A990&gt;
+username = 'user2', salt = b'G\x13\x12Et\x9c\x94&amp;^\xaao\xf0\xe6\xec\x94\xcf'
+verifier = b'|b\xb7\x13\xef\x04\xf7;\xa6\xc2V\xd3\x8f\x97\xc5\x14\xd95\x1d(\t\xac\xfc@\xb6\x01E\x82P]C\x8d'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+                conn.commit()
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            raise DatabaseError("User already exists.")
+        except sqlite3.Error as e:
+            logger.error(f"Failed to add user: {e}")
+&gt;           raise DatabaseError("Failed to add user.") from e
+E           src.core.exceptions.DatabaseError: Failed to add user.
+
+src\database\repository.py:68: DatabaseError
+
+During handling of the above exception, another exception occurred:
+
+service = &lt;src.service.link_service.LinkService object at 0x000001DD08F6AAD0&gt;
+
+    def test_login_invalid_password(service):
+&gt;       service.register_user("user2", "pass")
+
+tests\test_service.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08F6AAD0&gt;
+username = 'user2', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+            self.repository.add_user(username, salt, verifier)
+            logger.info(f"User '{username}' registered successfully.")
+            return True
+        except Exception as e:
+            logger.error(f"Registration failed for user '{username}': {e}")
+&gt;           raise SaveLinksError("Registration failed. Username might be taken.")
+E           src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+
+src\service\link_service.py:27: SaveLinksError</failure></testcase><testcase classname="tests.test_service" name="test_add_search_link" time="0.018"><failure message="src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.">self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F6AD50&gt;
+username = 'user3', salt = b'\xe1\xb2gv\x8c2\x86\x9e\x1fj\xdd\xc4\xd9D\xa0\xfa'
+verifier = b"\xdc\x0b%|y\x1d\x9c\x17\x15*\xe8=\xe1\xa4\x89\xa9c\x8c\r\xd4\xb0\xe2A.\xdc'3ft\x9fs_"
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+&gt;               cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+E               sqlite3.OperationalError: no such table: users
+
+src\database\repository.py:58: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08F6AE90&gt;
+username = 'user3', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+&gt;           self.repository.add_user(username, salt, verifier)
+
+src\service\link_service.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F6AD50&gt;
+username = 'user3', salt = b'\xe1\xb2gv\x8c2\x86\x9e\x1fj\xdd\xc4\xd9D\xa0\xfa'
+verifier = b"\xdc\x0b%|y\x1d\x9c\x17\x15*\xe8=\xe1\xa4\x89\xa9c\x8c\r\xd4\xb0\xe2A.\xdc'3ft\x9fs_"
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+                conn.commit()
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            raise DatabaseError("User already exists.")
+        except sqlite3.Error as e:
+            logger.error(f"Failed to add user: {e}")
+&gt;           raise DatabaseError("Failed to add user.") from e
+E           src.core.exceptions.DatabaseError: Failed to add user.
+
+src\database\repository.py:68: DatabaseError
+
+During handling of the above exception, another exception occurred:
+
+service = &lt;src.service.link_service.LinkService object at 0x000001DD08F6AE90&gt;
+
+    def test_add_search_link(service):
+&gt;       service.register_user("user3", "pass")
+
+tests\test_service.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08F6AE90&gt;
+username = 'user3', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+            self.repository.add_user(username, salt, verifier)
+            logger.info(f"User '{username}' registered successfully.")
+            return True
+        except Exception as e:
+            logger.error(f"Registration failed for user '{username}': {e}")
+&gt;           raise SaveLinksError("Registration failed. Username might be taken.")
+E           src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+
+src\service\link_service.py:27: SaveLinksError</failure></testcase><testcase classname="tests.test_service" name="test_search_no_results" time="0.017"><failure message="src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.">self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F0FA80&gt;
+username = 'user4', salt = b'\xa0\x90"\xffx\x7f\x14S\x97?f\xfd\xb8(\x94\xb1'
+verifier = b'1\xc71\xab8(&amp;`\xd8\x1d\x9d(]\x90\xdf1\xe6Fh\x8b\xe1\x8a\x04\x9dI\t\x0eS\x10?\x936'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+&gt;               cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+E               sqlite3.OperationalError: no such table: users
+
+src\database\repository.py:58: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08F0FBB0&gt;
+username = 'user4', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+&gt;           self.repository.add_user(username, salt, verifier)
+
+src\service\link_service.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F0FA80&gt;
+username = 'user4', salt = b'\xa0\x90"\xffx\x7f\x14S\x97?f\xfd\xb8(\x94\xb1'
+verifier = b'1\xc71\xab8(&amp;`\xd8\x1d\x9d(]\x90\xdf1\xe6Fh\x8b\xe1\x8a\x04\x9dI\t\x0eS\x10?\x936'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+                conn.commit()
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            raise DatabaseError("User already exists.")
+        except sqlite3.Error as e:
+            logger.error(f"Failed to add user: {e}")
+&gt;           raise DatabaseError("Failed to add user.") from e
+E           src.core.exceptions.DatabaseError: Failed to add user.
+
+src\database\repository.py:68: DatabaseError
+
+During handling of the above exception, another exception occurred:
+
+service = &lt;src.service.link_service.LinkService object at 0x000001DD08F0FBB0&gt;
+
+    def test_search_no_results(service):
+&gt;       service.register_user("user4", "pass")
+
+tests\test_service.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD08F0FBB0&gt;
+username = 'user4', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+            self.repository.add_user(username, salt, verifier)
+            logger.info(f"User '{username}' registered successfully.")
+            return True
+        except Exception as e:
+            logger.error(f"Registration failed for user '{username}': {e}")
+&gt;           raise SaveLinksError("Registration failed. Username might be taken.")
+E           src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+
+src\service\link_service.py:27: SaveLinksError</failure></testcase><testcase classname="tests.test_service" name="test_delete_link" time="0.017"><failure message="src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.">self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F0FE10&gt;
+username = 'user5', salt = b'\xaf\xa6\x13{\xc2E\x9dSrP8\x9a\x0e/\xe1\xdd'
+verifier = b'\xa1\x92{\xf4\xf74\x83p\x10\xcai\xae!.:\xf5\x02`\x1d\xcb\xad\x88 \x89\x9d2X\xee\xac\x18F\x00'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+&gt;               cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+E               sqlite3.OperationalError: no such table: users
+
+src\database\repository.py:58: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD09074180&gt;
+username = 'user5', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+&gt;           self.repository.add_user(username, salt, verifier)
+
+src\service\link_service.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.database.repository.LinkRepository object at 0x000001DD08F0FE10&gt;
+username = 'user5', salt = b'\xaf\xa6\x13{\xc2E\x9dSrP8\x9a\x0e/\xe1\xdd'
+verifier = b'\xa1\x92{\xf4\xf74\x83p\x10\xcai\xae!.:\xf5\x02`\x1d\xcb\xad\x88 \x89\x9d2X\xee\xac\x18F\x00'
+
+    def add_user(self, username: str, salt: bytes, verifier: bytes) -&gt; int:
+        """Adds a new user to the database."""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO users (username, salt, verifier) VALUES (?, ?, ?)",
+                    (username, salt, verifier)
+                )
+                conn.commit()
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            raise DatabaseError("User already exists.")
+        except sqlite3.Error as e:
+            logger.error(f"Failed to add user: {e}")
+&gt;           raise DatabaseError("Failed to add user.") from e
+E           src.core.exceptions.DatabaseError: Failed to add user.
+
+src\database\repository.py:68: DatabaseError
+
+During handling of the above exception, another exception occurred:
+
+service = &lt;src.service.link_service.LinkService object at 0x000001DD09074180&gt;
+
+    def test_delete_link(service):
+&gt;       service.register_user("user5", "pass")
+
+tests\test_service.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;src.service.link_service.LinkService object at 0x000001DD09074180&gt;
+username = 'user5', password = 'pass'
+
+    def register_user(self, username, password):
+        """Registers a new user."""
+        if not username or not password:
+            raise ValidationError("Username and password cannot be empty.")
+    
+        salt = SecurityManager.generate_salt()
+        key = SecurityManager.derive_key(password, salt)
+        verifier = SecurityManager.hash_key(key)
+    
+        try:
+            self.repository.add_user(username, salt, verifier)
+            logger.info(f"User '{username}' registered successfully.")
+            return True
+        except Exception as e:
+            logger.error(f"Registration failed for user '{username}': {e}")
+&gt;           raise SaveLinksError("Registration failed. Username might be taken.")
+E           src.core.exceptions.SaveLinksError: Registration failed. Username might be taken.
+
+src\service\link_service.py:27: SaveLinksError</failure></testcase></testsuite></testsuites>
