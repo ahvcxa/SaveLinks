@@ -3,3 +3,8 @@ __pycache__/
 .env
 .topics.txt
 .hidden_topics/
+app.log
+output.txt
+results.xml
+test_out.txt
+test_output.txt
